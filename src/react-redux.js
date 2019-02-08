@@ -31,7 +31,7 @@ export const connect = (mapStateToProps, mapActionToProps) => (Child) => {
       const {
         getState
       } = this.context
-      let states = mapStateToProps(getState())
+      let states = mapStateToProps ? mapStateToProps(getState()) : {}
       this.setState({
         ...states
       })
@@ -41,7 +41,7 @@ export const connect = (mapStateToProps, mapActionToProps) => (Child) => {
         dispatch,
       } = this.context
 
-      const actionProps = mapActionToProps
+      const actionProps = mapActionToProps || {}
       const actions = {}
       for (let key in actionProps) {
         if (actionProps.hasOwnProperty(key)) {

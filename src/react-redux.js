@@ -11,7 +11,7 @@ export class Provider extends React.Component {
   }
 }
 
-export const connect = (mapStateToProps, mapActionToProps) => (Child) => {
+export const connect = (mapStateToProps, mapDispatchToProps = {}) => (Child) => {
   return class NewComponent extends React.Component {
     static contextType = NewContext
     constructor(props) {

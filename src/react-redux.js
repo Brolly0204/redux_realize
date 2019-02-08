@@ -1,6 +1,6 @@
 import React from 'react'
 
-let NewContext = React.createContext({})
+const NewContext = React.createContext({})
 export class Provider extends React.Component {
   render() {
     return (
@@ -11,44 +11,49 @@ export class Provider extends React.Component {
   }
 }
 
+export const bindActionCreators = (mapDispatchToProps = {}, dispatch) => {
+  const actions = {}
+  Object.keys(mapDispatchToProps).forEach(k => {
+    actions[k] = () => dispatch(mapDispatchToProps[k]())
+  })
+  return actions
+}
+
 export const connect = (mapStateToProps, mapDispatchToProps = {}) => (Child) => {
   return class NewComponent extends React.Component {
     static contextType = NewContext
+
     constructor(props) {
       super(props)
       this.state = {}
     }
+
     componentWillMount() {
       const {
         subscribe
       } = this.context
 
-      this.handleSate()
-
-      subscribe(this.handleSate)
+      this._updateState()
+      subscribe(this._updateState)
     }
-    handleSate = () => {
+
+    _updateState = () => {
       const {
-        getState
+        getState,
+        dispatch
       } = this.context
-      let states = mapStateToProps ? mapStateToProps(getState()) : {}
+
+      const states = mapStateToProps ? mapStateToProps(getState(), this.props) : {}
+      const actions = bindActionCreators(mapDispatchToProps, dispatch)
+
       this.setState({
-        ...states
+        ...states,
+        ...actions
       })
     }
-    render() {
-      const {
-        dispatch,
-      } = this.context
 
-      const actionProps = mapActionToProps || {}
-      const actions = {}
-      for (let key in actionProps) {
-        if (actionProps.hasOwnProperty(key)) {
-          actions[key] = () => dispatch(actionProps[key]())
-        }
-      }
-      return <Child {...this.state} {...actions}/>
+    render() {
+      return <Child {...this.state}/>
     }
   }
 }

@@ -8,10 +8,12 @@ export function createStore(reducer) {
 
   function subscribe(listener) {
     listeners.push(listener)
+    return () => {
+      listeners.filter(l => l !== listener)
+    }
   }
 
   function dispatch(action) {
-    console.log(action, currentState)
     currentState = reducer(currentState, action)
     listeners.forEach(fn => fn())
     return action
